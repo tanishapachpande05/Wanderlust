@@ -7,6 +7,7 @@ const methodOverride= require("method-override");
 const ejsMate = require("ejs-mate");
 const wrapAsync= require("./utils/wrapAsync.js");
 const ExpressError= require("./utils/ExpressError.js");
+const {listingSchema}= require("./schema.js");
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname,"views"));
@@ -32,6 +33,16 @@ async function main(){
 //     console.log("REQ BODY:", req.body);
 //     next();
 // });
+
+const validateListing = (req,res,next)=>{
+    let {error}= listingSchema.validate(req.body);
+    if(error){
+        let errMsg=error.details.map((el)=>el.message).join(",");
+        throw new ExpressError(400, "Bad Request");
+    }else{
+        next();
+    }
+};
 
 app.get("/", (req,res)=>{
     res.send("This is Home page");
@@ -60,18 +71,15 @@ app.get("/listings/:id",wrapAsync(async (req,res)=>{
 }))
 
 // Create Route
-app.post("/listings", wrapAsync(async (req,res, next)=>{
-    if(!req.body.listing){
-        throw new ExpressError(400, "Send valid data for listing");
-    }
-        const newListing = new Listing(req.body.listing);   // here listing is an object containing title, description, price, and all.
-        await newListing.save();
-        res.redirect("/listings")
-        })
+app.post("/listings",validateListing, wrapAsync(async (req,res, next)=>{
+    const newListing= new Listing(req.body.listing);
+    await newListing.save();
+    res.redirect("/listings");
+
     // let {title, description, image, price, location, country} = req.body;
     // let listing = req.body.listing;
     // console.log(listing);
-);
+}));
 
 // Edit Route
 app.get("/listings/:id/edit", wrapAsync(async (req,res)=>{
@@ -83,10 +91,7 @@ app.get("/listings/:id/edit", wrapAsync(async (req,res)=>{
 
 
 // Update Route
-app.put("/listings/:id", wrapAsync(async (req,res,next)=>{
-    if(!req.body.listing){
-        throw new ExpressError(400, "Send valid data for listing");
-    }
+app.put("/listings/:id", validateListing, wrapAsync(async (req,res,next)=>{
     let {id}=req.params;
     await Listing.findByIdAndUpdate(id, {...req.body.listing});     // ... means destruct. To break into individual parts
     res.redirect(`/listings/${id}`);           // show route
@@ -118,16 +123,17 @@ app.delete("/listings/:id", wrapAsync(async (req,res,next)=>{
 
 
 
-// app.all("*", (req, res, next)=>{
+// app.use("*", (req, res, next)=>{
 //     next(new ExpressError(404, "Page Not Found!"));
 // })
 
 app.use((err,req, res, next)=>{
     let {statusCode=500, message="Something went wrong!"}=err;
-    res.status(statusCode).send(message);
+    // res.status(statusCode).send(message);       //this ExpressError will display error message on screen/page
+    res.status(statusCode).render("error.ejs", {err});
 })
 
-// app.use((err, req, res, next)=>{
+// app.use((err, req, res, next) => {
 //     res.send("Something went wrong!");
 // })
 
