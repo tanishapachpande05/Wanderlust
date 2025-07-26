@@ -1,19 +1,14 @@
 <% layout('layouts/boilerplate.ejs') %>
-
+    <!-- Instead of adding success message here, add it in boilerplate.ejs file. -->
     <h3>All Listings</h3>
-    <!-- <form method="get" action="/listings/new">
-        <button>Create New Listing</button>
-    </form> -->
 
     <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1">
         <%for(let listing of allListings){%>
             <a href="/listings/<%=listing._id%>" class="listing-link">
-                <div class="card col">
-                    <img src="<%=listing.image%>" class="card-img-top" alt="listing_image" style="height: 20rem;">
+                <div class="card col listing-card">
+                    <img src="<%=listing.image.url%>" class="card-img-top" alt="listing_image" style="height: 20rem;">
                     <div class="card-img-overlay">
                         <h5 class="card-title"></h5>
-                        <!-- <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p> -->
-                        <!-- <p class="card-text"><small>Last updated 3 mins ago</small></p> -->
                       </div>
                     <div class="card-body">
                       <p class="card-text">
@@ -27,11 +22,6 @@
     </div>
 
 
-    <!-- <ul>
-        <%for(let listing of allListings){%>
-            <li><a href="/listings/<%=listing._id%>"><%=listing.title%></a></li>
-        <%}%>
-    </ul> -->
 
 
 

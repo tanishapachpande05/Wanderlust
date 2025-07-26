@@ -20,11 +20,17 @@
                             Looks good!
                         </div>
                     </div>
+
                     <div class="mb-3">
-                        <label for="image" class="form-label">Image link:</label>
-                        <input id="image" type="text" name="listing[image]" value="<%=listing.image%>"
+                        <img src= "<%=originalImageUrl%>">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="image" class="form-label">Upload New Image</label>
+                        <input id="image" type="file" name="listing[image]"
                             class="form-control" />
                     </div>
+
                     <div class="row">
                         <div class="mb-3 col-md-4">
                             <label for="price" class="form-label">Price:</label>
